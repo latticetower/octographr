@@ -5,9 +5,7 @@ require __dir__ + '/repo.rb'
 
 class RedisStore
 
-  REDIS_HOST = ENV['REDIS_HOST']
-  REDIS_PORT = ENV['REDIS_PORT']
-  REDIS_PASS = ENV['REDIS_PASS']
+  REDIS_URL = ENV['HEROKU_REDIS_WHITE_URL']
 
   PREFIX_REPO = 'repo:'
   KEY_RECENT = "recent_repos"
@@ -15,10 +13,7 @@ class RedisStore
   MAX_RECENT_REPOS = 10
 
   def initialize
-    @redis = Redis.new \
-      :host => REDIS_HOST,
-      :port => REDIS_PORT,
-      :password => REDIS_PASS
+    @redis = Redis.new :url => REDIS_URL
   end
 
   # Fetches repository info from Redis

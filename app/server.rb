@@ -80,10 +80,17 @@ get '/login' do
   authenticate!
 end
 
-get '/login_callback' do
+get '/auth_callback' do
   session_code = request.env['rack.request.query_hash']['code']
   result = Octokit.exchange_code_for_token(session_code, CLIENT_ID, CLIENT_SECRET)
   session[:access_token] = result[:access_token]
+  
+  client = Octokit::Client.new :access_token => access_token
+  session[:user][:login] = client.user.login
+  session[:user][:avatar_url] = client.user.avatar_url
+  session[:user][:html_url] = client.user.html_url
+  session[:user][:name] = client.user.name
+
 
   redirect '/'
 end
