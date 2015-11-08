@@ -21,8 +21,12 @@ class RedisStore
   # @param [String] full_name - owner/repo_name
   # @return [Repo]  - repository info
   def get_repo(full_name)
-    repo = Repo.new
-    repo.from_json!(@redis.get PREFIX_REPO + full_name)
+    repo = nil
+    repo_json = @redis.get PREFIX_REPO + full_name
+    if repo_json then
+      repo = Repo.new
+      repo.from_json!(repo_json)
+    end
     repo
   end
 
