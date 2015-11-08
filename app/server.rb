@@ -96,14 +96,9 @@ get '/auth_callback' do
   session_code = request.env['rack.request.query_hash']['code']
   result = Octokit.exchange_code_for_token(session_code, OCTOKIT_CLIENT_ID, OCTOKIT_CLIENT_SECRET)
   session[:access_token] = result[:access_token]
-<<<<<<< HEAD
 
   client = Octokit::Client.new :access_token => result[:access_token]
   session[:user] = {}
-=======
-
-  client = Octokit::Client.new :access_token => access_token
->>>>>>> added simple file downloader
   session[:user][:login] = client.user.login
   session[:user][:avatar_url] = client.user.avatar_url
   session[:user][:html_url] = client.user.html_url
