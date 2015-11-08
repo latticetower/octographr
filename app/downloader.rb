@@ -2,6 +2,7 @@ require 'http'
 require 'rubygems/package'
 require 'open-uri'
 require 'open_uri_redirections'
+require 'FileUtils'
 
 require __dir__ + "/scala_parser.rb"
 
@@ -58,6 +59,11 @@ class Downloader
     ensure
       g.close()
     end
+    archive_name
+  end
+
+  def remove_temp_archive(archive_name)
+    FileUtils.rm(archive_name) if File.exists? archive_name
   end
 
   def get_hash(archive_name)
