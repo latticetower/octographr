@@ -5,7 +5,6 @@ require 'octokit'
 require File.dirname(__FILE__) + '/repo.rb'
 require File.dirname(__FILE__) + '/redis_store.rb'
 
-# 6224b76420f3d4f36d7152f751cbeac2fff76891
 OCTOKIT_CLIENT_ID = ENV['OCTOKIT_CLIENT_ID']
 OCTOKIT_CLIENT_SECRET = ENV['OCTOKIT_CLIENT_SECRET']
 
@@ -16,59 +15,57 @@ def authenticated?
 end
 
 def authenticate!
-  client = Octokit::Client.new 
-  url = client.authorize_url OCTOKIT_CLIENT_ID, 
-  	:scope => 'user:email'
+  client = Octokit::Client.new
+  url = client.authorize_url OCTOKIT_CLIENT_ID, :scope => 'user:email'
 
   redirect url
 end
 
-get '/' do 
-	@recent_repos = RedisStore.new().get_recent_repos()
-	slim :index
+get '/' do
+  @recent_repos = RedisStore.new().get_recent_repos()
+  slim :index
 end
 
 get '/repo/:owner/:name' do
-	owner = params['owner']
-	name = params['name']
+  owner = params['owner']
+  name = params['name']
+  @repo = RedisStore.new().get_repo(owner + '/' + name)
 
-	@repo = RedisStore.new().get_repo(owner + '/' + name)
-
-	slim :repo
+  slim :repo
 end
 
 post '/repo' do
-	full_name = params['query']
-	parts = full_name.split("/")
-	owner = parts[0]
-	name = parts[1]
-	#todo: check in cache
-	#todo: chech on github
+  full_name = params['query']
+  parts = full_name.split("/")
+  owner = parts[0]
+  name = parts[1]
+  #todo: check in cache
+  #todo: chech on github
 
-	client = Octokit::Client.new \
-		:client_id => OCTOKIT_CLIENT_ID, 
-		:client_secret => OCTOKIT_CLIENT_SECRET
-	exists = client.repository? :repo => name, :owner => owner
-	
-	if !exists then
-		redirect to('/')
-	else		
-		result = client.repo :repo => name, :owner => owner
-		branch = client.ref full_name, "heads/master"
-	
+  client = Octokit::Client.new \
+    :client_id => OCTOKIT_CLIENT_ID,
+    :client_secret => OCTOKIT_CLIENT_SECRET
+  exists = client.repository? :repo => name, :owner => owner
+
+  if !exists then
+    redirect to('/')
+  else
+    result = client.repo :repo => name, :owner => owner
+    branch = client.ref full_name, "heads/master"
+
 
 		repo = Repo.new \
-			:id => result.id,
-			:owner => result.owner.login,
-			:name => result.name,
-			:url => result.html_url,
-			:last_commit => branch.object.sha,
-			:update_ts => Time.now.to_i
+      :id => result.id,
+      :owner => result.owner.login,
+      :name => result.name,
+      :url => result.html_url,
+      :last_commit => branch.object.sha,
+      :update_ts => Time.now.to_i
 
-		RedisStore.new().put_repo(repo)
+    RedisStore.new().put_repo(repo)
 
-		redirect to('/repo/' + owner + '/' + name)
-	end
+    redirect to('/repo/' + owner + '/' + name)
+  end
 end
 
 get '/login' do

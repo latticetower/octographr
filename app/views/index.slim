@@ -1,35 +1,35 @@
 .jumbotron
-	.row
-		.col-md-8
-			.center-block.centered
-				form.form-inline action="/repo" method="post"
-					input.form-control.input-lg type="text" name="query" placeholder="owner/repo" autofocus="autofocus"
-					button.btn.btn-primary.input-lg type="submit"  
-						span.glyphicon.glyphicon-search 
-						| Scan
+  .row
+    .col-md-8
+      .center-block.centered
+        form.form-inline action="/repo" method="post"
+          input.form-control.input-lg type="text" name="query" placeholder="owner/repo" autofocus="autofocus"
+          button.btn.btn-primary.input-lg type="submit"
+            span.glyphicon.glyphicon-search
+            | Scan
 
-		.col-md-4
-			a.btn.btn-block.btn-social.btn-github.btn-lg href="/login"
-				span.fa.fa-github
-				| Log in with GitHub
+    .col-md-4
+      a.btn.btn-block.btn-social.btn-github.btn-lg href="/login"
+        span.fa.fa-github
+        | Log in with GitHub
 
 
 
 .row
-	.col-md-6
-		h3
-			span.glyphicon.glyphicon-time
-			| Recent repos
-		ul.list-group
-			- @recent_repos.each do |repo|
-				li.list-group-item
-					span= "#{repo.owner}/#{repo.name}"	
-					span.pull-right.text-muted= repo.last_commit	
-	.col-md-6
-		h3 
-			span.glyphicon.glyphicon-user 
-			| Your repos
-		ul.list-group
-			li.list-group-item repo 1
-			li.list-group-item repo 2
-			li.list-group-item repo 3	
+  .col-md-6
+    h3
+      span.glyphicon.glyphicon-time
+      | Recent repos
+    ul.list-group
+      - @recent_repos.each do |repo|
+        li.list-group-item
+          span= "#{repo.owner}/#{repo.name}"
+          span.pull-right.text-muted= repo.last_commit
+  .col-md-6
+    h3
+      span.glyphicon.glyphicon-user
+      | Your repos
+    ul.list-group
+      li.list-group-item repo 1
+      li.list-group-item repo 2
+      li.list-group-item repo 3
