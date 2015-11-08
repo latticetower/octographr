@@ -82,7 +82,7 @@ end
 
 get '/auth_callback' do
   session_code = request.env['rack.request.query_hash']['code']
-  result = Octokit.exchange_code_for_token(session_code, CLIENT_ID, CLIENT_SECRET)
+  result = Octokit.exchange_code_for_token(session_code, OCTOKIT_CLIENT_ID, OCTOKIT_CLIENT_SECRET)
   session[:access_token] = result[:access_token]
   
   client = Octokit::Client.new :access_token => access_token
