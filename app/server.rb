@@ -4,7 +4,7 @@ require 'octokit'
 
 require __dir__ + '/repo.rb'
 require __dir__ + '/redis_store.rb'
-require __dir__ + '/downloader.rb'
+require __dir__ + '/workers/worker.rb'
 
 OCTOKIT_CLIENT_ID = ENV['OCTOKIT_CLIENT_ID']
 OCTOKIT_CLIENT_SECRET = ENV['OCTOKIT_CLIENT_SECRET']
@@ -86,11 +86,10 @@ post '/repo' do
     :last_commit_url => commit.html_url,
     :update_ts => Time.now.to_i,
     :state => 'processing'
-
-  v = Octokit.archive_link(full_name)
-  Downloader.new().start_download(v, branch.object.sha)
   redis_store.put_repo(repo)
 
+  DownloadWorker.perform_async(full_name)
+  
   redirect to('/repo/' + owner + '/' + name)
 end
 
