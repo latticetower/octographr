@@ -2,8 +2,8 @@ require 'sinatra'
 require 'slim'
 require 'octokit'
 
-require File.expand_path(File.dirname(__FILE__)) + '/repo.rb'
-require File.expand_path(File.dirname(__FILE__)) + '/redis_store.rb'
+require __dir__ + '/repo.rb'
+require __dir__ + '/redis_store.rb'
 
 OCTOKIT_CLIENT_ID = ENV['OCTOKIT_CLIENT_ID']
 OCTOKIT_CLIENT_SECRET = ENV['OCTOKIT_CLIENT_SECRET']

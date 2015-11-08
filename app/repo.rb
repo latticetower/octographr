@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/jsonable.rb'
+require __dir__ + '/jsonable.rb'
 
 class Repo < JSONable
   attr_accessor :id

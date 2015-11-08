@@ -1,7 +1,7 @@
 require 'json'
 require 'redis'
 
-require File.dirname(__FILE__) + '/repo.rb'
+require __dir__ + '/repo.rb'
 
 class RedisStore
 
