@@ -1,0 +1,15 @@
+.row
+	.col-md-12
+		h1 
+			a href="#{@repo.url}"
+				= "#{@repo.owner}/#{@repo.name}"
+
+		p.text-muted 
+			= "Commit: #{@repo.last_commit}"
+
+		p.text-muted 
+			= "Updated: #{Time.at(@repo.update_ts)}"
+	
+.row
+	.col-md-12
+		.well Here be dragons...
