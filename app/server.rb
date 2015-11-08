@@ -85,7 +85,7 @@ get '/auth_callback' do
   result = Octokit.exchange_code_for_token(session_code, OCTOKIT_CLIENT_ID, OCTOKIT_CLIENT_SECRET)
   session[:access_token] = result[:access_token]
   
-  client = Octokit::Client.new :access_token => access_token
+  client = Octokit::Client.new :access_token => result[:access_token]
   session[:user][:login] = client.user.login
   session[:user][:avatar_url] = client.user.avatar_url
   session[:user][:html_url] = client.user.html_url
