@@ -51,15 +51,16 @@ post '/repo' do
   else
     result = client.repo :repo => name, :owner => owner
     branch = client.ref full_name, "heads/master"
+    commit = client.commit full_name, branch.object.sha
     #TODO: use default branch instead of master
 
-
-		repo = Repo.new \
+    repo = Repo.new \
       :id => result.id,
       :owner => result.owner.login,
       :name => result.name,
       :url => result.html_url,
-      :last_commit => branch.object.sha,
+      :last_commit_sha => branch.object.sha,
+      :last_commit_url => commit.html_url,
       :update_ts => Time.now.to_i
 
     RedisStore.new().put_repo(repo)
@@ -69,7 +70,7 @@ post '/repo' do
 end
 
 get '/login' do
-	authenticate!
+  authenticate!
 end
 
 get '/login_callback' do

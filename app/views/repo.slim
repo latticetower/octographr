@@ -5,7 +5,10 @@
         = "#{@repo.owner}/#{@repo.name}"
 
     p.text-muted
-      = "Commit: #{@repo.last_commit}"
+      | Commit:&nbsp;
+      a.text-muted href="#{@repo.last_commit_url}" 
+        = "#{@repo.last_commit_sha}"
+      i.fa.fa-file-code-o.fa-fw
 
     p.text-muted
       = "Updated: #{Time.at(@repo.update_ts)}"
