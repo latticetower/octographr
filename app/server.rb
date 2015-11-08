@@ -69,6 +69,10 @@ post '/repo' do
   end
 end
 
+get '/draw_graph' do
+  slim :test_graph, :layout => false
+end
+
 get '/login' do
   authenticate!
 end
