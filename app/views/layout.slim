@@ -6,12 +6,11 @@ html lang="en"
     link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"
     link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet"
     link href="/vendor/bootstrap-social/bootstrap-social.css" rel="stylesheet"
-    javascript:
-      var rumbleBannerBackgroundColor, rumbleBannerTextColor, rumbleBannerLinkColor, rumbleBannerPlacement;
-      rumbleBannerBackgroundColor = "#161616";
-      rumbleBannerTextColor = "#b0b0b0";
-      rumbleBannerLinkColor = "#ffffff";
-      rumbleBannerPlacement = "top"; // Optionally replace with "bottom".
+    script type="text/javascript"
+    | var rumbleBannerBackgroundColor = "#161616",
+    | rumbleBannerTextColor = "#b0b0b0",
+    | rumbleBannerLinkColor = "#ffffff",
+    | rumbleBannerPlacement = "top";
 
     script src="https://d4nnn7wspfa3h.cloudfront.net/banner-2015.js"
 
@@ -24,14 +23,14 @@ html lang="en"
         .navbar-header
           a.navbar-brand href="/" Octographr
 
-        - if authenticated?  
+        - if authenticated?
           .collapse.navbar-collapse
-            p.nav.navbar-text 
-              |Logged in as 
+            p.nav.navbar-text
+              |Logged in as
               b #{session[:user][:name]}
             .ul.nav.navbar-nav.navbar-right
               li
-                a href="/logout" Logout  
+                a href="/logout" Logout
 
       - if @redirect_message
         .alert.alert-danger.alert-dismissible role="alert"
