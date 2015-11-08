@@ -11,3 +11,4 @@ gem "rake"
 gem "rspec"
 gem "http"
 gem 'open_uri_redirections'
+gem 'sidekiq'
