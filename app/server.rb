@@ -53,22 +53,22 @@ post '/repo' do
   # Check in cache
   redis_store = RedisStore.new()
   repo = redis_store.get_repo(full_name)
-  if repo then
-    redirect to('/repo/' + full_name)
-  end
+  #if repo then
+  #  redirect to('/repo/' + full_name)
+  #end
 
   # Check on GitHub
   client = Octokit::Client.new \
     :client_id => OCTOKIT_CLIENT_ID,
     :client_secret => OCTOKIT_CLIENT_SECRET
-  exists = client.repository? :repo => name, :owner => owner      
-  if !exists then 
+  exists = client.repository? :repo => name, :owner => owner
+  if !exists then
     redirect_msg('/', "Repository '#{full_name}' not found.")
   end
 
-  # Check repo languages  
+  # Check repo languages
   langs = client.languages full_name
-  if not langs.to_hash.has_key? :Scala then 
+  if not langs.to_hash.has_key? :Scala then
     redirect_msg('/', 'Sorry, only Scala repositories are currently supported.')
   end
 
@@ -89,7 +89,7 @@ post '/repo' do
   redis_store.put_repo(repo)
 
   DownloadWorker.perform_async(full_name)
-  
+
   redirect to('/repo/' + owner + '/' + name)
 end
 
@@ -126,6 +126,6 @@ get '/auth_callback' do
 end
 
 before do
-  @redirect_message = session[:redirect_message] 
+  @redirect_message = session[:redirect_message]
   session[:redirect_message] = nil
 end
