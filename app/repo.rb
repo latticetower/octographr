@@ -8,6 +8,7 @@ class Repo < JSONable
   attr_accessor :last_commit_sha
   attr_accessor :last_commit_url
   attr_accessor :update_ts
+  attr_accessor :state  # processing or done
 
   def initialize
   end
@@ -20,6 +21,7 @@ class Repo < JSONable
     @last_commit_sha = options[:last_commit_sha]
     @last_commit_url = options[:last_commit_url]
     @update_ts = options[:update_ts]
+    @state = options[:state]
   end
 end
 

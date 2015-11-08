@@ -64,7 +64,8 @@ post '/repo' do
       :url => result.html_url,
       :last_commit_sha => branch.object.sha,
       :last_commit_url => commit.html_url,
-      :update_ts => Time.now.to_i
+      :update_ts => Time.now.to_i,
+      :state => 'processing'
 
     RedisStore.new().put_repo(repo)
 

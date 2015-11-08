@@ -15,4 +15,11 @@
 
 .row
   .col-md-12
-    .well Here be dragons...
+    .well.text-center 
+      - if @repo.state == 'done' 
+        p Nice chart here
+      - elsif @repo.state == 'processing'
+        i.fa.fa-cog.fa-spin.fa-5x
+        div We are working hard to process this repository.
+      - else 
+        p Here be dragons...
