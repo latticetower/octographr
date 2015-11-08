@@ -48,10 +48,12 @@ post '/repo' do
   client = Octokit::Client.new \
     :client_id => OCTOKIT_CLIENT_ID,
     :client_secret => OCTOKIT_CLIENT_SECRET
-  exists = client.repository? :repo => name, :owner => owner
+  exists = client.repository? :repo => name, :owner => owner      
+  if !exists then redirect to('/')
 
-  if !exists then
-    redirect to('/')
+  langs = client.languages full_name
+  if not langs.include 'Scala' then redirect ('/')
+
   else
     result = client.repo :repo => name, :owner => owner
     branch = client.ref full_name, "heads/master"
@@ -70,7 +72,6 @@ post '/repo' do
 
     v = Octokit.archive_link(full_name)
     Downloader.new().start_download(v, branch.object.sha)
-
     RedisStore.new().put_repo(repo)
 
     redirect to('/repo/' + owner + '/' + name)
