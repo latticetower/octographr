@@ -35,7 +35,10 @@ get '/repo/:owner/:name' do
 end
 
 post '/repo' do
-  full_name = params['query']
+  redirect to('/') if params['query'].nil?
+  full_name = params['query'][/\A([\w-]+)\/([\w-]+)\z/]
+  redirect to('/') if full_name.nil?
+
   owner, name = full_name.split("/")
 
   #todo: check in cache
