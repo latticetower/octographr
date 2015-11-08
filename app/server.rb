@@ -80,6 +80,13 @@ get '/login' do
   authenticate!
 end
 
+get '/logout' do
+  session[:access_token] = nil
+  session[:user] = {}
+
+  redirect '/'
+end
+
 get '/auth_callback' do
   session_code = request.env['rack.request.query_hash']['code']
   result = Octokit.exchange_code_for_token(session_code, OCTOKIT_CLIENT_ID, OCTOKIT_CLIENT_SECRET)

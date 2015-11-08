@@ -9,9 +9,10 @@
             | Scan
 
     .col-md-4
-      a.btn.btn-block.btn-social.btn-github.btn-lg href="/login"
-        span.fa.fa-github
-        | Log in with GitHub
+      - if not authenticated?  
+        a.btn.btn-block.btn-social.btn-github.btn-lg href="/login"
+          span.fa.fa-github
+          | Log in with GitHub
 
 
 
