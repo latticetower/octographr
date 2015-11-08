@@ -8,7 +8,7 @@ html lang="en"
     link href="/vendor/bootstrap-social/bootstrap-social.css" rel="stylesheet"
     link href="/vendor/graph_style.css" rel="stylesheet"
     script type="text/javascript"
-      == "window.graph_data = eval(#{@data.to_json});"
+      == "var graph_data = eval(#{@data.to_json});"
 
     meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui"
       /[if lt IE 9]

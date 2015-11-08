@@ -41,7 +41,7 @@ style: cytoscape.stylesheet()
   'opacity': 0.25,
   'text-opacity': 0
   }),
-elements: window.graph_data,
+elements: graph_data,
 ready: function(){
 window.cy = this;
 // giddy up
