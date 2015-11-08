@@ -2,7 +2,7 @@ require 'http'
 require 'rubygems/package'
 require 'open-uri'
 require 'open_uri_redirections'
-require 'FileUtils'
+require 'fileutils'
 
 require __dir__ + "/scala_parser.rb"
 
