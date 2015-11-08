@@ -10,9 +10,6 @@ class Repo < JSONable
   attr_accessor :update_ts
   attr_accessor :state  # processing or done
 
-  def initialize
-  end
-
   def initialize(options = {})
     @id = options[:id]
     @owner = options[:owner]
@@ -24,4 +21,3 @@ class Repo < JSONable
     @state = options[:state]
   end
 end
-

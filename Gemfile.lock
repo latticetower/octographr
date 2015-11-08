@@ -20,6 +20,7 @@ GEM
     multipart-post (2.0.0)
     octokit (4.1.1)
       sawyer (~> 0.6.0, >= 0.5.3)
+    open_uri_redirections (0.2.1)
     parslet (1.7.1)
       blankslate (>= 2.0, <= 4.0)
     rack (1.6.4)
@@ -62,6 +63,7 @@ PLATFORMS
 DEPENDENCIES
   http
   octokit (~> 4.0)
+  open_uri_redirections
   parslet
   rake
   redis
