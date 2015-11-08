@@ -15,8 +15,16 @@ describe ScalaParser, "primitive test" do
     end
     it "should parse simple var names and class names" do
       expect(parser.class_name).to parse("Rrrrrr")
+      expect(parser.var_expressions).to parse("val a: F, var b:P, c:PJ, d")
     end
     it "should parse string with class name in different situations" do
+      expect(parser.class_expr).to parse("class Cccccc")
+      expect(parser.class_expr).to parse("case class Ccccf")
+      expect(parser.class_expr).to parse("class DDddd()")
+      expect(parser.class_expr).to parse("class FFff extends P with Y with M")
+    end
+    it "should parse trait name" do
+      expect(parser.trait_expr).to parse("trait K")
     end
   end
 end
