@@ -69,7 +69,7 @@ post '/repo' do
       :state => 'processing'
 
     v = Octokit.archive_link(full_name)
-    Downloader.new(v).start_download(branch.object.sha)
+    Downloader.new().start_download(v, branch.object.sha)
 
     RedisStore.new().put_repo(repo)
 

@@ -7,31 +7,35 @@ require __dir__ + "/scala_parser.rb"
 
 class Downloader
   attr_reader :repo_path
-  def initialize(path)
-    @repo_path = path
+  def initialize()
+    #@repo_path = path
     @parser = ScalaParser.new
   end
 
-  def start_download(target)
+  def start_download(path, target)
     g = open(__dir__ + "/public/temp/#{target}.log", 'w')
     begin
-      g.write(@repo_path)
+      g.write(path)
     ensure
       g.close()
     end
-    archive_name = __dir__ + "/public/temp/#{target}.tar"
+    archive_name = __dir__ + "/public/temp/#{target}.tar.gz"
     begin
-      opened_url = open(@repo_path, "User-Agent" =>"octographr", :allow_redirections => :safe)
+      opened_url = open(path, "User-Agent" =>"octographr", :allow_redirections => :safe) #{|f|
+      #f.each_line {|line| p line}
+      #}
+      #puts(opened_url.status)
+      #puts(opened_url.read)
     rescue Timeout::Error
-      puts "The request for a page at #{@repo_path} timed out...skipping."
+      puts "The request for a page at #{path} timed out...skipping."
       return
-    rescue OpenURI::Error => e
-      puts "The request for a page at #{@repo_path} returned an error. #{e.message}"
+    rescue OpenURI::HTTPError => e
+      puts "The request for a page at #{path} returned an error. #{e.message}"
       return
     end
     f = open(archive_name, 'wb')
     begin
-      f << opened_url.read
+      f.write(opened_url.read)
 
       #system("wget --user-agent='octographr' -P #{__dir__ }/public/temp #{repo_path}")
       #Curl::Easy.perform(@repo_path) do |curl|
@@ -57,19 +61,21 @@ class Downloader
   end
 
   def get_hash(archive_name)
+    puts(archive_name)
     get_sources_for_archive(archive_name) do |file_contents|
-      parser.parse(s)
+      @parser.parse_file(file_contents)
     end
   end
 
   def get_sources_for_archive(archive_name, file_types = [".scala"])
     File.open(archive_name, "rb") do |file|
-
-        Gem::Package::TarReader.new(file) do |tar|
+      Zlib::GzipReader.wrap(file) do |gz|
+        Gem::Package::TarReader.new(gz) do |tar|
           tar.each do |entry|
             yield entry.read if entry.file? and file_types.include? File.extname(entry.full_name)
           end
         end
+      end
 
     end if block_given?
   end

@@ -50,4 +50,11 @@ class ScalaParser < Parslet::Parser
     space >> class_name.as(:current_class) >> space? >> (lparen >> var_expressions.as(:params).maybe >> rparen).maybe >> parent_classes.as(:parent).maybe }
   rule(:some_expr) { package_expr.maybe | (import_expr | trait_expr | class_expr | (var_expr >> endl.maybe)).repeat }
   root(:some_expr)
+
+  def parse_file(file)
+    parse(file)
+  rescue Parslet::ParseFailed => failure
+    puts failure.cause.ascii_tree
+    {}
+  end
 end
