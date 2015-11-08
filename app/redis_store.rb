@@ -5,9 +5,9 @@ require __dir__ + '/repo.rb'
 
 class RedisStore
 
-  REDIS_HOST = "pub-redis-14629.us-east-1-4.5.ec2.garantiadata.com"
-  REDIS_PORT = "14629"
-  REDIS_PASS = "octographr"
+  REDIS_HOST = ENV['REDIS_HOST']
+  REDIS_PORT = ENV['REDIS_PORT']
+  REDIS_PASS = ENV['REDIS_PASS']
 
   PREFIX_REPO = 'repo:'
   KEY_RECENT = "recent_repos"

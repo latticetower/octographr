@@ -36,9 +36,8 @@ end
 
 post '/repo' do
   full_name = params['query']
-  parts = full_name.split("/")
-  owner = parts[0]
-  name = parts[1]
+  owner, name = full_name.split("/")
+
   #todo: check in cache
   #todo: chech on github
 
@@ -52,6 +51,7 @@ post '/repo' do
   else
     result = client.repo :repo => name, :owner => owner
     branch = client.ref full_name, "heads/master"
+    #TODO: use default branch instead of master
 
 
 		repo = Repo.new \
