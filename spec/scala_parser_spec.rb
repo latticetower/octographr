@@ -25,6 +25,9 @@ describe ScalaParser, "primitive test" do
     end
     it "should parse trait name" do
       expect(parser.trait_expr).to parse("trait K")
+      expect(parser.optional_brackets).to parse("{}")
+      expect(parser.optional_brackets).to parse("{gggg}")
+      expect(parser.optional_brackets).to parse("{g{g}g{}g}")
     end
   end
 end

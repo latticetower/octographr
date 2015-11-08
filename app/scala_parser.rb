@@ -11,7 +11,7 @@ class ScalaParser < Parslet::Parser
   rule(:word_extends) { str('extends') }
   rule(:word_with) { str('with') }
   rule(:colon) { str(':') }
-  rule(:endl) { match('\\n') }
+  rule(:endl) { (match('\\n') |space).repeat(1) }
 
   rule(:space)      { match('\s').repeat(1) }
   rule(:space?)     { space.maybe }
@@ -26,7 +26,7 @@ class ScalaParser < Parslet::Parser
   rule(:not_rparen) { match('[^)]*') }
   rule(:lbracket) {str('{')}
   rule(:rbracket) {str('}')}
-  rule(:not_rbracket) { match('[^}]*') }
+  rule(:not_rbracket) { match('[^}]').repeat }
   rule(:comma) { space? >> str(',') >> space? }
 
 
@@ -38,17 +38,20 @@ class ScalaParser < Parslet::Parser
       space? >> (colon >> space? >> var_type.as(:var_type)).maybe }
   rule(:var_expressions) { var_expr >> (comma >> var_expr).repeat }
 
-  rule(:package_name) { match('a-zA-Z_-').repeat(1) }
+  rule(:package_name) { match('[a-zA-Z_-]').repeat(1) }
   #todo: add complex rule to ignored {} contents
 
+  rule(:optional_brackets) { lbracket >> not_rbracket >> rbracket}
 
-  rule(:package_expr) { word_package >> space >> package_name >> (str('.') >> package_name).repeat.maybe >> endl }
+  rule(:package_expr) { space? >> word_package >> space >> (package_name >> (str('.') >> package_name).repeat).as(:package) >> endl.maybe }
   rule(:import_expr) { word_import >> space >> package_name >> (str('.') >> package_name).repeat.maybe >> endl }
 
-  rule(:trait_expr) { word_trait >> space >> class_name.as(:trait_name) >> space? }
+  rule(:trait_expr) { word_trait >> space >> class_name.as(:trait_name) >> space? >> (optional_brackets | endl).maybe }
   rule(:class_expr) { space? >> (word_case >> space).maybe >> word_class >>
-    space >> class_name.as(:current_class) >> space? >> (lparen >> var_expressions.as(:params).maybe >> rparen).maybe >> parent_classes.as(:parent).maybe }
-  rule(:some_expr) { package_expr.maybe | (import_expr | trait_expr | class_expr | (var_expr >> endl.maybe)).repeat }
+    space >> class_name.as(:current_class) >>
+    ((lparen >> var_expressions.as(:params).maybe >> rparen) | space).maybe >> parent_classes.as(:parent).maybe >> (optional_brackets | endl).maybe }
+
+  rule(:some_expr) { package_expr.maybe >> (import_expr | trait_expr | class_expr | var_expr | endl).repeat.as(:elements) }
   root(:some_expr)
 
   def parse_file(file)

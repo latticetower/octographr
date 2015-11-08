@@ -61,22 +61,53 @@ class Downloader
   end
 
   def get_hash(archive_name)
-    puts(archive_name)
     get_sources_for_archive(archive_name) do |file_contents|
       @parser.parse_file(file_contents)
     end
   end
 
   def get_sources_for_archive(archive_name, file_types = [".scala"])
+    result = []
     File.open(archive_name, "rb") do |file|
       Zlib::GzipReader.wrap(file) do |gz|
         Gem::Package::TarReader.new(gz) do |tar|
           tar.each do |entry|
-            yield entry.read if entry.file? and file_types.include? File.extname(entry.full_name)
+            result << yield(entry.read) if entry.file? and file_types.include? File.extname(entry.full_name)
           end
         end
       end
-
     end if block_given?
+    result
+  end
+
+  def select_shape(x, classes, trait_names)
+    if classes.include? x
+      'rectangle'
+    else
+      'ellipse'
+    end
+  end
+
+  def collect_from_hash(v)
+    vv = v.flat_map{|x| x[:elements]}.compact
+    trait_names = vv.map{|x| x[:trait_name]}.compact
+    parent_types = vv.flat_map{|x| x[:parent]}.compact.map{|x| x[:parent_type]}
+    classes =  vv.flat_map{|x| x[:current_class]}.compact
+    nodes = [classes, parent_types, trait_names].flatten.map(&:to_s).uniq.map{|x|
+      {:data => {:id => x, :name => x, :weight => 45, :faveColor=> '#EDA1ED', :faveShape => select_shape(x, classes, trait_names)}}
+    }
+
+    edges = vv.select{|x|x[:current_class]}.select{|y| y[:parent]}.map{|x|
+       [x[:parent]].flatten.map{|y|
+      {:data => {:source => x[:current_class].to_s, :target => y[:parent_type].to_s } ,
+      :strength =>45, :faveColor=> '#6FB1FC'}
+    }}.flatten.uniq
+    {:nodes => nodes, :edges => edges}
+  end
+
+  def save_to_json(file, h)
+    File.open(file, "w") do |f|
+      f.write(h.to_json)
+    end
   end
 end

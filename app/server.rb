@@ -94,6 +94,7 @@ post '/repo' do
 end
 
 get '/draw_graph' do
+  @data = JSON.parse(File.read(__dir__ + "/public/temp/test_repo.json"))
   slim :test_graph, :layout => false
 end
 
