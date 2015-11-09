@@ -14,11 +14,12 @@
       = "Updated: #{Time.at(@repo.update_ts)}"
 
   - if @repo.state == 'done'
+    If graph is not shown, then parser probably couldn't parse repo you provided :(
     script type="text/javascript"
       == "var graph_data = JSON.parse('#{@data.to_json}');"
     #cy
   - elsif @repo.state == 'processing'
     i.fa.fa-cog.fa-spin.fa-5x
-    div We are working hard to process this repository.
+    div We are working hard to process this repository. Press F5 to update page
   - else
-    p Here be dragons...
+    p Here be dragons
