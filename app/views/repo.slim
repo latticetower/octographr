@@ -13,15 +13,12 @@
     p.text-muted
       = "Updated: #{Time.at(@repo.update_ts)}"
 
-.row
-  .col-md-12
-    .well.text-center
-      - if @repo.state == 'done'
-        script type="text/javascript"
-          == "var graph_data = JSON.parse('#{@data.to_json}');"
-        #cy
-      - elsif @repo.state == 'processing'
-        i.fa.fa-cog.fa-spin.fa-5x
-        div We are working hard to process this repository.
-      - else
-        p Here be dragons...
+  - if @repo.state == 'done'
+    script type="text/javascript"
+      == "var graph_data = JSON.parse('#{@data.to_json}');"
+    #cy
+  - elsif @repo.state == 'processing'
+    i.fa.fa-cog.fa-spin.fa-5x
+    div We are working hard to process this repository.
+  - else
+    p Here be dragons...
