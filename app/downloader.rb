@@ -100,7 +100,8 @@ class Downloader
     parent_types = vv.flat_map{|x| x[:parent]}.compact.map{|x| x[:parent_type]}
     classes =  vv.flat_map{|x| x[:current_class]}.compact
     nodes = [classes, parent_types, trait_names].flatten.map(&:to_s).uniq.map{|x|
-      {:data => {:id => x, :name => x, :weight => 45, :faveColor=> '#EDA1ED', :faveShape => select_shape(x, classes, trait_names)}}
+      {:data => {:id => x, :name => x, :weight => 45, :faveColor=> '#EDA1ED', :faveShape => select_shape(x, classes, trait_names)
+        }}
     }
 
     edges = vv.select{|x|x[:current_class]}.select{|y| y[:parent]}.map{|x|

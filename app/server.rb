@@ -57,9 +57,9 @@ post '/repo' do
   # Check in cache
   redis_store = RedisStore.new()
   repo = redis_store.get_repo(full_name)
-  #if repo then
-  #  redirect to('/repo/' + full_name)
-  #end
+  if repo then
+    redirect to('/repo/' + full_name)
+  end
 
   # Check on GitHub
   client = Octokit::Client.new \
