@@ -37,6 +37,9 @@ get '/repo/:owner/:name' do
   owner = params['owner']
   name = params['name']
   @repo = RedisStore.new().get_repo(owner + '/' + name)
+  json_name = __dir__  + "/public/temp/#{@repo.last_commit_sha}.json"
+  @data = JSON.parse(File.read(json_name)) if File.exists(json_name)
+  @data |= {}
 
   slim :repo
 end
