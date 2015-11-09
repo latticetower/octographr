@@ -20,8 +20,6 @@
         script type="text/javascript"
           == "var graph_data = eval(#{@data.to_json});"
         #cy
-        script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"
-        script src="/vendor/code.js"
       - elsif @repo.state == 'processing'
         i.fa.fa-cog.fa-spin.fa-5x
         div We are working hard to process this repository.
