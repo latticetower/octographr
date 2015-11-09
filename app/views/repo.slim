@@ -18,7 +18,7 @@
     .well.text-center
       - if @repo.state == 'done'
         script type="text/javascript"
-          == "var graph_data = eval(#{@data.to_json});"
+          == "var graph_data = JSON.parse('#{@data.to_json}');"
         #cy
       - elsif @repo.state == 'processing'
         i.fa.fa-cog.fa-spin.fa-5x

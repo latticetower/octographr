@@ -105,8 +105,8 @@ class Downloader
 
     edges = vv.select{|x|x[:current_class]}.select{|y| y[:parent]}.map{|x|
        [x[:parent]].flatten.map{|y|
-      {:data => {:source => x[:current_class].to_s, :target => y[:parent_type].to_s } ,
-      :strength =>45, :faveColor=> '#6FB1FC'}
+      {:data => {:source => x[:current_class].to_s, :target => y[:parent_type].to_s  ,
+      :strength =>45, :faveColor=> '#6FB1FC'}}
     }}.flatten.uniq
     {:nodes => nodes, :edges => edges}
   end
