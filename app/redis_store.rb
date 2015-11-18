@@ -35,11 +35,13 @@ class RedisStore
   # @param [Repo] repo - repository info
   def put_repo(repo)
     full_name = repo.owner + '/' + repo.name
-
+    names = @redis.lrange(KEY_RECENT, 0, MAX_RECENT_REPOS)
     @redis.multi do |tx|
       tx.set(PREFIX_REPO + full_name, repo.to_json)
-      tx.lpush(KEY_RECENT, full_name)
-      tx.ltrim(KEY_RECENT, 0, MAX_RECENT_REPOS - 1)
+      if !(names.include?(full_name))
+        tx.lpush(KEY_RECENT, full_name)
+        tx.ltrim(KEY_RECENT, 0, MAX_RECENT_REPOS - 1)
+      end
     end
   end
 

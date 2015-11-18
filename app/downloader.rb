@@ -98,18 +98,21 @@ class Downloader
     vv = v.flat_map{|x| x[:elements]}.compact
     trait_names = vv.map{|x| x[:trait_name]}.compact
     parent_types = vv.flat_map{|x| x[:parent]}.compact.map{|x| x[:parent_type]}
+    constructor_types = vv.flat_map{|x| x[:params]}.compact.map{|x| x[:var_type][:type]}
     classes =  vv.flat_map{|x| x[:current_class]}.compact
-    nodes = [classes, parent_types, trait_names].flatten.map(&:to_s).uniq.map{|x|
-      {:data => {:id => x, :name => x, :weight => 45, :faveColor=> '#EDA1ED', :faveShape => select_shape(x, classes, trait_names)
+    nodes = [classes, parent_types, trait_names, constructor_types].flatten.map(&:to_s).uniq.map{|x|
+      {:data => {:id => x, :name => x, :weight => 25, :faveColor=> 'navy', :faveShape => select_shape(x, classes, trait_names)
         }}
     }
 
     edges = vv.select{|x|x[:current_class]}.select{|y| y[:parent]}.map{|x|
        [x[:parent]].flatten.map{|y|
       {:data => {:source => x[:current_class].to_s, :target => y[:parent_type].to_s  ,
-      :strength =>45, :faveColor=> '#6FB1FC'}}
+      :strength =>15, :faveColor=> '#6FB1FC'}}
     }}.flatten.uniq
+
     {:nodes => nodes, :edges => edges}
+
   end
 
   def save_to_json(file, h)
