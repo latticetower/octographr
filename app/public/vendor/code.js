@@ -2,7 +2,9 @@ $(function(){ // on dom ready
 $('#cy').cytoscape({
 layout: {
   name: 'cose',
-  padding: 10
+  padding: 10,
+  idealEdgeLength: 100,
+  nodeOverlap: 20
   },
 style: cytoscape.stylesheet()
   .selector('node')

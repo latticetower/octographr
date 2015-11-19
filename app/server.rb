@@ -1,10 +1,12 @@
 require 'sinatra'
 require 'slim'
 require 'octokit'
+require "base64"
 
 require __dir__ + '/repo.rb'
 require __dir__ + '/redis_store.rb'
 require __dir__ + '/workers/worker.rb'
+
 
 OCTOKIT_CLIENT_ID = ENV['OCTOKIT_CLIENT_ID']
 OCTOKIT_CLIENT_SECRET = ENV['OCTOKIT_CLIENT_SECRET']
@@ -37,11 +39,8 @@ get '/repo/:owner/:name' do
   owner = params['owner']
   name = params['name']
   @repo = RedisStore.new().get_repo(owner + '/' + name)
-  json_name = __dir__  + "/public/temp/#{@repo.last_commit_sha}.json"
-  @data = {}
-
-  @data = JSON.parse(File.read(json_name)) if File.exists?(json_name)
-
+  @data = JSON.load(Base64.decode64(@repo.graph_data)) if @repo.graph_data && @repo.graph_data.length > 0
+  
   slim :repo
 end
 
@@ -57,9 +56,9 @@ post '/repo' do
   # Check in cache
   redis_store = RedisStore.new()
   repo = redis_store.get_repo(full_name)
-  if repo then
-    redirect to('/repo/' + full_name)
-  end
+  #if repo.graph_data then
+  #  redirect to('/repo/' + full_name)
+  #end
 
   # Check on GitHub
   client = Octokit::Client.new \

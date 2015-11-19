@@ -14,7 +14,7 @@
       = "Updated: #{Time.at(@repo.update_ts)}"
 
   - if @repo.state == 'done'
-    If graph is not shown, then parser probably couldn't parse repo you provided :(
+    div If graph is not shown, then parser probably couldn't parse repo you provided :(
     script type="text/javascript"
       == "var graph_data = JSON.parse('#{@data.to_json}');"
     #cy
