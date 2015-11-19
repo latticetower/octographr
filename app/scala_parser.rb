@@ -7,7 +7,7 @@ class ScalaParser < Parslet::Parser
     (str('private') >> space? >> str('[') >> package_name >> str(']')) |
     str('sealed') |
     str('protected') |
-    str('abstract') }
+    str('abstract') | str('override')}
 
   rule(:word_case)  { str('case') }
   rule(:word_trait) { str('trait') }
@@ -32,16 +32,16 @@ class ScalaParser < Parslet::Parser
   rule(:not_rbracket_or_rparen) {
     #some_expr |
     (
-      comment    |
-      import_expr |
-      object_expr|
-      trait_expr |
+      comment.as(:comment)    |
+      import_expr.as(:import) |
+      object_expr.as(:object) |
+      trait_expr.as(:trait) |
       class_expr.as(:class) |
       var_expression.as(:variable) |
-      endl |
-      space|
-      ignored_line_with_brackets | #.as(:ignored_v)
-      bracketed_ignored_content #.as(:ignored_b)
+      endl.as(:endl) |
+      space.as(:space)|
+      ignored_line_with_brackets.as(:ignored) | #.as(:ignored_v)
+      bracketed_ignored_content.as(:ignored) #.as(:ignored_b)
        #var_expr |
 
     ).repeat(1) | some_expr
@@ -122,24 +122,29 @@ class ScalaParser < Parslet::Parser
     ((package_name >> dot).repeat >> class_name) >> (endl | eof) } #.as(:import_line)
 
   #object and class
-  rule(:parent_classes) { word_extends >> space >>
-    class_name.as(:parent_type) >>
-    (space >> word_with >> space >> class_name.as(:parent_type)).repeat }
+  rule(:parent_classes_tail) {
+    var_type.as(:parent_type) >>
+    (match[' '].repeat(1) >> word_with >> space >> parent_classes_tail.as(:rest)
+    ).maybe }
+  rule(:parent_classes) { word_extends >> space >> parent_classes_tail }
 
-  rule(:object_expr) { (word_modifier >> space).maybe >>
-    word_object >> str(' ').repeat(1) >> class_name.as(:current_class) >>
-    (space >> parent_classes.as(:parent)).maybe >> str(' ').repeat >> (
-      optional_brackets |
-      optional_brackets_ignored.as(:ignored) |
-      endl)
+  rule(:object_expr) { (word_modifier >> space).repeat >>
+    word_object >> str(' ').repeat(1) >> class_name.as(:name) >>
+    (match[' '].repeat >> parent_classes.as(:parent)).maybe >> space? >>
+    (lbracket >>
+      (
+        bracket_content.as(:optional_brackets) |
+        bracketed_ignored_content.as(:ignored_brackets)
+      ).maybe >> rbracket
+    ).maybe
   }
 
   rule(:class_expr) { (word_modifier >> space).maybe >>
-    (word_case >> space).maybe >> word_class >> space >> class_name.as(:current_class) >> space? >>
+    (word_case >> space).maybe >> word_class >> space >> class_name.as(:name) >> match[' '].repeat >>
       (lparen >> (
-          var_arguments.as(:params).maybe |
-          bracketed_ignored_content.as(:ignored).maybe
-          ) >> rparen
+          var_arguments.as(:params) |
+          bracketed_ignored_content.as(:ignored_brackets)
+          ).maybe >> rparen
       ).maybe >>
     (space? >> parent_classes.as(:parent)).maybe >> space? >>
     (lbracket >>
@@ -151,27 +156,36 @@ class ScalaParser < Parslet::Parser
   }
 
   #trait
-  rule(:trait_expr) { (word_modifier >> space).maybe >> word_trait >>
-    space >> class_name.as(:trait_name) >> (space >> parent_classes.as(:parent)).maybe >>
-    space? >> (optional_brackets_ignored.as(:ignored) | endl | eof).maybe }
+  rule(:trait_expr) { (word_modifier >> space).repeat >> word_trait >>
+    space >> class_name.as(:name) >> (match[' '].repeat(1) >> parent_classes.as(:parent)).maybe >>
+    space? >> (lbracket >>
+      (
+        bracket_content.as(:optional_brackets) |
+        bracketed_ignored_content.as(:ignored_brackets)
+      ).maybe >> rbracket
+    ).maybe
+    }
 
   #variables
   rule(:var_name) { match('[a-zA-Z0-9_]').repeat(1) }
   rule(:var_simple_type) { match('[a-zA-Z0-9_]').repeat(1) }
 
-  rule(:ignored_param_value) { ignored_line_with('^(){},') }
+  rule(:ignored_param_value) { ignored_line_with('^(){},\\n') }
   #these are constructor/method parameters divided by commas:
-  rule(:var_arg) { (word_val | word_var).maybe >> space? >> var_name >>
-      space? >> (colon >> space? >>
-      var_type.as(:var_type) >>
-      (space? >> str('=') >> ignored_param_value ).maybe
+  rule(:var_arg) { (word_val | word_var).maybe >> space? >> var_name.as(:name) >>
+      match[' '].repeat >> (colon >> space? >>
+      (
+        (var_type.as(:var_type) >>
+        (match[' '].repeat >> str('=') >> ignored_param_value) |
+        ignored_param_value)
+       ).maybe
       ).maybe }
   rule(:var_arguments) { (space? >> comma.maybe >> space? >> var_arg).repeat }
 
-  rule(:var_expression) { (word_val | word_var) >> str(' ').repeat(1) >> var_name >>
+  rule(:var_expression) { (word_modifier >> str(' ').repeat).repeat >> (word_val | word_var) >> str(' ').repeat(1) >> var_name >>
       str(' ').repeat >> (colon >> space? >>
       var_type.as(:var_type) >>
-      (space? >> str('=') >> ignored_param_value ).maybe
+      (match[' '].repeat >> str('=') >> ignored_param_value ).maybe
       ).maybe }
 
   rule(:var_type_list) {
@@ -185,9 +199,9 @@ class ScalaParser < Parslet::Parser
       comment |
       package_expr |
       import_expr |
-      object_expr |
+      object_expr.as(:object) |
       class_expr.as(:class) |
-      trait_expr |
+      trait_expr.as(:trait) |
       #var_expression.as(:variable) |
       endl | #.as(:endl) |
       space | #.as(:space) |
@@ -202,3 +216,25 @@ class ScalaParser < Parslet::Parser
     {}
   end
 end
+
+
+class ScalaTransformer < Parslet::Transform
+    rule(:type => simple(:x)) { x.to_s }
+    rule(:type => simple(:x), :next => simple(:y)) { [x.to_s, y.to_s] }
+    rule(:type => simple(:x), :next => sequence(:y)) { y.map(&:to_s).unshift(x.to_s) }
+    rule(:next => sequence(:x)) {x}
+    rule(:next => simple(:x)) {[x]}
+    rule(:subtype => simple(:y)) {[y]}
+    rule(:type => simple(:x), :subtype => sequence(:y)) { y.unshift(x.to_s) }
+    rule(:parent_type => simple(:x)) {[x] }
+    rule({ :parent_type => simple(:x), :rest => {:parent_type => sequence(:y)}}) {y.unshift(x).uniq}
+    rule({ :parent_type => sequence(:x), :rest => {:parent_type => sequence(:y)}}) { (y << x).flatten.uniq }
+    rule({ :parent_type => simple(:x), :rest => sequence(:y)}) { y.unshift(x).uniq }
+    rule({:parent_type => sequence(:x), :rest => sequence(:y)}) { (y << x).flatten.uniq }
+    rule(:parent_type => sequence(:x)) {x}
+    rule(:parent_type => simple(:x)) {[x]}
+    rule(:var_type => simple(:x)) {[x]}
+    rule(:var_type => sequence(:x)) {x}
+    rule({:name => simple(:z), :var_type => sequence(:x)}) {x}
+    rule(:name => simple(:x)){ }
+ end
